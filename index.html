@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#13283b">
+  <title>2조 UX 연구 | 무인 주문 키오스크 A/B/C 사용성 실험</title>
+  <style>
+    :root{--ink:#13283b;--muted:#587083;--edge:#d9e2e9;--bg:#eef3f6;--paper:#fff;--accent:#16727a;--accent2:#116169;--soft:#e7f3f1;--bad:#b84935;--warn:#fdf0e4;--shadow:0 16px 55px rgba(15,39,58,.09)}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,"Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
+    button,input,select{font:inherit}
+    button{cursor:pointer;border:1px solid transparent}
+    button:disabled{cursor:not-allowed;opacity:.4}
+    button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #4db4af;outline-offset:2px}
+    .wrap{max-width:1210px;margin:0 auto;padding:26px 22px 60px}
+    .head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 0 20px}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.025em}
+    .brand-mark{height:42px;width:42px;display:grid;place-items:center;background:var(--ink);color:white;border-radius:13px;font-size:19px}
+    .eyebrow{font-size:12px;font-weight:800;letter-spacing:.11em;color:var(--accent);text-transform:uppercase}
+    .muted{color:var(--muted)}
+    h1,h2,h3,p{margin-top:0}h1{font-size:clamp(26px,4vw,38px);line-height:1.2;letter-spacing:-.04em;margin-bottom:12px}h2{font-size:clamp(21px,2.7vw,29px);letter-spacing:-.03em;margin-bottom:12px}h3{font-size:18px;letter-spacing:-.02em}
+    .card,.shell{background:var(--paper);border:1px solid #e0e8ed;border-radius:23px;box-shadow:var(--shadow)}
+    .card{padding:30px}.shell{overflow:hidden}.intro{max-width:860px;margin:auto}
+    .grid{display:grid;gap:16px}.two{grid-template-columns:repeat(2,minmax(0,1fr))}.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.between{justify-content:space-between}
+    .pill{display:inline-block;padding:7px 11px;border-radius:999px;border:1px solid #c4d4d9;background:#f4f8fa;font-size:12px;font-weight:750}
+    .primary,.secondary,.ghost,.danger{border-radius:12px;padding:12px 17px;font-weight:760;min-height:46px}
+    .primary{background:var(--accent);color:white}.primary:hover:not(:disabled){background:var(--accent2)}
+    .secondary{background:white;border:1px solid #adc4c8;color:var(--accent2)}.secondary:hover{background:var(--soft)}
+    .ghost{color:var(--ink);background:#eaf0f4;border-color:#e0e6e9}.ghost:hover{background:#dde6eb}
+    .danger{color:var(--bad);border:1px solid #eac4bc;background:white}
+    .field{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}.field label{font-weight:750;font-size:14px}
+    .field input,.field select{width:100%;min-height:48px;border:1px solid #c9d8de;background:white;border-radius:11px;padding:10px 13px;color:var(--ink)}
+    .note{font-size:13px;color:var(--muted)}.mini{font-size:12px;color:var(--muted)}
+    .info{background:#f0f8f8;border:1px solid #d0e9e7;padding:16px 18px;border-radius:14px}
+    .warn{background:var(--warn);border:1px solid #efdec6;color:#69492a;padding:13px;border-radius:12px}
+    .device{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:660px}
+    .sidebar{background:#f7fafb;border-right:1px solid var(--edge);padding:23px 19px}
+    .side-title{font-size:13px;font-weight:850;color:var(--muted);margin-bottom:6px}
+    .side-task{font-size:17px;font-weight:800;margin-bottom:12px}
+    .task-text{padding:15px;background:white;border:1px solid var(--edge);border-radius:13px;white-space:pre-line;font-weight:600}
+    .metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+    .metric{border-radius:12px;background:white;border:1px solid var(--edge);padding:11px 9px}
+    .metric b{font-size:21px;display:block;line-height:1.2;font-variant-numeric:tabular-nums}
+    .metric span{font-size:11px;color:var(--muted)}
+    .sidebar ul{padding-left:19px;color:var(--muted);font-size:13px}
+    .screen{padding:27px 30px 35px;min-width:0}
+    .topline{display:flex;justify-content:space-between;align-items:center;gap:14px;border-bottom:1px solid var(--edge);padding-bottom:16px;margin-bottom:22px}
+    .nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+    .nav button{padding:10px 13px;border-radius:10px;background:#f5f8f9;color:var(--ink);border:1px solid var(--edge);font-weight:750}
+    .nav button.active{background:var(--accent);color:white;border-color:var(--accent)}
+    .item-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:15px 0 24px}
+    .flat-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.flat-grid .item{min-height:143px;padding:12px}
+    .item{background:white;text-align:left;padding:15px;min-height:167px;border:1px solid var(--edge);border-radius:17px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;transition:transform .12s,box-shadow .12s}
+    .item:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(18,58,75,.1);border-color:#84afb0}
+    .emoji{font-size:32px;line-height:1.3}.item strong{font-size:15px}.price{font-weight:850;color:var(--accent2);margin-top:auto}
+    .choice-list{display:flex;flex-wrap:wrap;gap:9px;margin:10px 0 20px}
+    .choice{padding:10px 14px;background:#fff;border:1.5px solid var(--edge);border-radius:12px;min-width:86px;font-weight:760;text-align:center}
+    .choice.selected{background:var(--soft);border-color:var(--accent);color:var(--accent2)}
+    .option-block{border:1px solid var(--edge);padding:17px 19px;border-radius:14px;margin-bottom:14px}
+    .option-block h3{margin:0 0 10px}
+    .steps{display:flex;gap:8px;margin:0 0 20px;flex-wrap:wrap}.step{flex:1;text-align:center;border-radius:9px;padding:10px 6px;font-size:12px;font-weight:850;background:#edf1f3;color:#738696;min-width:100px}.step.now{background:var(--accent);color:white}.step.done{background:#dceeea;color:#20736b}
+    .receipt{border:1px dashed #b3c5cc;border-radius:16px;padding:19px;background:#fbfdfd;margin:14px 0 22px}
+    .receipt-row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #e3e9ec}.receipt-row:last-child{border-bottom:0}
+    .section-space{margin-top:21px}.buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}.buttons button{min-width:120px}
+    .survey-item{padding:16px 0;border-bottom:1px solid var(--edge)}.survey-item p{margin-bottom:10px;font-weight:720}
+    .radio-line{display:flex;gap:6px;flex-wrap:wrap}.rating{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;background:#f4f8fa;border:1px solid #dfe6ea;border-radius:11px;min-width:55px;padding:7px}
+    .rating input{accent-color:var(--accent);width:17px;height:17px}.rating span{font-size:12px;font-weight:700}
+    .summary-table{width:100%;border-collapse:collapse;margin:18px 0;font-size:13px}.summary-table th,.summary-table td{border-bottom:1px solid var(--edge);text-align:left;padding:11px 8px}.summary-table th{background:#f2f6f8}
+    .footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center}
+    @media(max-width:800px){.flat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.device{grid-template-columns:1fr}.sidebar{border-right:0;border-bottom:1px solid var(--edge)}.metrics{grid-template-columns:repeat(4,1fr)}.screen{padding:20px}.card{padding:23px}.item-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding:12px 10px 35px}}
+    @media(max-width:500px){.two,.three{grid-template-columns:1fr}.item-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.item{padding:12px;min-height:150px}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.rating{min-width:46px}.head{align-items:flex-start}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="head"><div class="brand"><div class="brand-mark">UX</div><div>2조 · 무인 주문 키오스크<div class="mini">Self-Ordering Kiosk Usability Study</div></div></div><span class="pill">연구용 시뮬레이터 · 실제 결제 없음</span></header>
+    <main id="app" aria-live="polite"></main>
+    <div class="footer">Hanyang University ERICA · UX & Usability · Team 2 · 연구 참여 기록은 이 브라우저에만 임시 보관됩니다.</div>
+  </div>
+  <script>
+    'use strict';
+    const STORAGE_KEY = 'team2-kiosk-pilot-v2';
+    const PRODUCTS = [
+      {id:'bulgogi',name:'불고기버거',icon:'🍔',price:5800},
+      {id:'cheese',name:'치즈버거',icon:'🧀',price:5400},
+      {id:'chicken',name:'치킨버거',icon:'🍗',price:6200}
+    ];
+    const DRINKS = [
+      {id:'cola',name:'콜라 M',icon:'🥤',price:2200},
+      {id:'zero',name:'제로콜라 M',icon:'🥤',price:2200}
+    ];
+    const TASKS = {
+      X:[
+        {id:'T1',label:'단품 주문',instruction:'불고기버거 단품 1개를 주문하세요.',target:{kind:'single',burger:'bulgogi',excluded:[],fries:null,drink:null,extraDrink:'none'}},
+        {id:'T2',label:'옵션 변경',instruction:'치즈버거 단품 1개(양파 제외)와 콜라 M 1개를 주문하세요.',target:{kind:'single',burger:'cheese',excluded:['onion'],fries:null,drink:null,extraDrink:'cola'}},
+        {id:'T3',label:'세트 주문',instruction:'치킨버거 세트 1개를 주문하세요. 감자튀김은 L, 세트 음료는 제로콜라로 선택하세요.',target:{kind:'set',burger:'chicken',excluded:[],fries:'L',drink:'zero',extraDrink:'none'}}
+      ],
+      Y:[
+        {id:'T1',label:'단품 주문',instruction:'치킨버거 단품 1개를 주문하세요.',target:{kind:'single',burger:'chicken',excluded:[],fries:null,drink:null,extraDrink:'none'}},
+        {id:'T2',label:'옵션 변경',instruction:'불고기버거 단품 1개(피클 제외)와 제로콜라 M 1개를 주문하세요.',target:{kind:'single',burger:'bulgogi',excluded:['pickle'],fries:null,drink:null,extraDrink:'zero'}},
+        {id:'T3',label:'세트 주문',instruction:'치즈버거 세트 1개를 주문하세요. 감자튀김은 L, 세트 음료는 콜라로 선택하세요.',target:{kind:'set',burger:'cheese',excluded:[],fries:'L',drink:'cola',extraDrink:'none'}}
+      ],
+      Z:[
+        {id:'T1',label:'단품 주문',instruction:'치즈버거 단품 1개를 주문하세요.',target:{kind:'single',burger:'cheese',excluded:[],fries:null,drink:null,extraDrink:'none'}},
+        {id:'T2',label:'옵션 변경',instruction:'치킨버거 단품 1개(양파 제외)와 콜라 M 1개를 주문하세요.',target:{kind:'single',burger:'chicken',excluded:['onion'],fries:null,drink:null,extraDrink:'cola'}},
+        {id:'T3',label:'세트 주문',instruction:'불고기버거 세트 1개를 주문하세요. 감자튀김은 L, 세트 음료는 제로콜라로 선택하세요.',target:{kind:'set',burger:'bulgogi',excluded:[],fries:'L',drink:'zero',extraDrink:'none'}}
+      ]
+    };
+    const SUS = [
+      '나는 이 키오스크를 자주 사용하고 싶다.',
+      '나는 이 키오스크가 불필요하게 복잡하다고 느꼈다.',
+      '나는 이 키오스크를 사용하기 쉽다고 생각한다.',
+      '이 키오스크를 사용하려면 다른 사람의 도움이 필요할 것 같다.',
+      '이 키오스크의 여러 기능이 잘 통합되어 있다고 느꼈다.',
+      '이 키오스크에는 일관되지 않은 점이 너무 많다고 느꼈다.',
+      '대부분의 사람들은 이 키오스크의 사용법을 빠르게 배울 것 같다.',
+      '이 키오스크는 사용하기 번거롭다고 느꼈다.',
+      '나는 이 키오스크를 자신 있게 사용할 수 있었다.',
+      '이 키오스크를 사용하기 전에 배워야 할 것이 많다고 느꼈다.'
+    ];
+    const CONDITIONS=['A','B','C'];
+    const MODE_NAMES={A:'계층형',B:'단계형',C:'전체 메뉴형'};
+    const PERMUTATIONS=['ABC','ACB','BAC','BCA','CAB','CBA'];
+    const app = document.getElementById('app');
+    let s = recover() || freshState();
+    function freshState(){return {screen:'setup',id:'',order:'ABC',setOrder:'XYZ',sessionIndex:0,taskIndex:0,records:[],events:[],surveys:[],answers:{},ui:null,taskStarted:null,taskCounter:0,startedAt:null,consentAt:null};}
+    function recover(){try{const raw=localStorage.getItem(STORAGE_KEY);const v=JSON.parse(raw);return v&&['setup','intro','ordering','sus','break','complete'].includes(v.screen)?v:null;}catch{return null;}}
+    function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(s));}catch(e){console.warn('로컬 저장 불가',e);}}
+    function safe(x){return String(x??'').replace(/[&<>"']/g,k=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[k]));}
+    function format(n){return Number(n).toLocaleString('ko-KR')+'원';}
+    function sessionMode(){return s.order[s.sessionIndex];}
+    function taskSet(){return s.setOrder[s.sessionIndex];}
+    function task(){return TASKS[taskSet()][s.taskIndex];}
+    function productName(id){return PRODUCTS.find(x=>x.id===id)?.name||id||'미선택';}
+    function drinkName(id){return DRINKS.find(x=>x.id===id)?.name||'없음';}
+    function kindName(id){return id==='set'?'세트':'단품';}
+    function nameForMode(){return MODE_NAMES[sessionMode()]||'알 수 없음';}
+    function emptyUI(){return {nav:'home',category:null,step:'product',selectedKind:'single',pending:null,main:null,extraDrink:'none',touches:0,errors:0};}
+    function currentOrder(){const u=s.ui;return {kind:u.main?.kind||null,burger:u.main?.burger||null,excluded:[...(u.main?.excluded||[])].sort(),fries:u.main?.kind==='set'?u.main?.fries||null:null,drink:u.main?.kind==='set'?u.main?.drink||null:null,extraDrink:u.extraDrink||'none'};}
+    function expected(){const t=task().target;return {...t,excluded:[...t.excluded].sort()};}
+    function matches(){return JSON.stringify(currentOrder())===JSON.stringify(expected());}
+    function logEvent(action,value='',error=false){if(s.screen!=='ordering')return;const now=Date.now();s.ui.touches++;if(error)s.ui.errors++;s.events.push({participant_id:s.id,session_index:s.sessionIndex+1,mode:sessionMode(),task_set:taskSet(),task_id:task().id,task_attempt:s.taskCounter,local_time:new Date(now).toISOString(),elapsed_sec:((now-s.taskStarted)/1000).toFixed(2),screen:s.ui.nav||s.ui.step,action,value,error_flag:error?1:0});}
+    function render(){let html='';if(s.screen==='setup')html=setupHtml();else if(s.screen==='intro')html=introHtml();else if(s.screen==='ordering')html=orderHtml();else if(s.screen==='sus')html=susHtml();else if(s.screen==='break')html=breakHtml();else html=completeHtml();app.innerHTML=html;save();tick();}
+    function setupHtml(){return `<section class="card intro">
+      <div class="eyebrow">연구자 설정 · 파일럿 테스트</div><h1>메뉴 구조에 따른 키오스크 사용성 비교</h1>
+      <p class="muted">계층형(A), 단계형(B), 전체 메뉴형(C)을 모두 사용하고 주문 수행 지표와 SUS 사용성 점수를 수집합니다. 실제 결제는 발생하지 않습니다.</p>
+      <div class="grid two">
+        <div class="field"><label for="pid">참가자 ID (실명 입력 금지)</label><input id="pid" placeholder="예: P01" maxlength="30" value="${safe(s.id)}" autocomplete="off"></div>
+        <div class="field"><label for="order">메뉴 구조 수행 순서</label><select id="order">${PERMUTATIONS.map(seq=>`<option value="${seq}" ${s.order===seq?'selected':''}>${seq.split('').map(m=>m+' '+MODE_NAMES[m]).join(' → ')}</option>`).join('')}</select></div>
+        <div class="field"><label for="setOrder">과업 세트 수행 순서</label><select id="setOrder">${PERMUTATIONS.map(seq=>{const sets=seq.replaceAll('A','X').replaceAll('B','Y').replaceAll('C','Z');return `<option value="${sets}" ${s.setOrder===sets?'selected':''}>${sets.split('').join(' → ')}</option>`;}).join('')}</select></div>
+        <div class="field"><label>본실험 권장 배정</label><div class="note" style="padding-top:9px">인터페이스 순서 6종(ABC, ACB, BAC, BCA, CAB, CBA)에 참가자 4명씩 배정합니다. 과업 세트 순서도 균형 있게 배정합니다.</div></div>
+      </div>
+      <div class="info"><strong>과업 세트</strong><br>X: 불고기 단품 → 치즈(양파 제외)+콜라 → 치킨 세트(L·제로)<br>Y: 치킨 단품 → 불고기(피클 제외)+제로 → 치즈 세트(L·콜라)<br>Z: 치즈 단품 → 치킨(양파 제외)+콜라 → 불고기 세트(L·제로)<p class="note" style="margin:8px 0 0">세 세트는 과업 유형을 맞춘 설계안입니다. 난이도의 동등성은 파일럿 테스트에서 점검해야 합니다.</p></div>
+      <label class="row" style="margin-top:20px"><input id="consent" type="checkbox" style="width:20px;height:20px;accent-color:var(--accent)"><span class="note">참가자에게 연구 목적, 화면 내 행동 기록 및 익명 데이터 보관에 대해 설명하고 참여 동의를 받았습니다.</span></label>
+      <div class="buttons"><button class="primary" data-action="start-study">연구 시작</button>${s.records.length?'<button class="secondary" data-action="download-tasks">기존 과업 CSV</button><button class="secondary" data-action="download-sus">기존 SUS CSV</button><button class="secondary" data-action="download-events">기존 이벤트 CSV</button>':''}</div>
+      <p class="note section-space">매 참가자 종료 후 CSV와 JSON 파일을 저장하고 새 참가자를 시작하세요. 실명·연락처를 입력하지 마세요. 기록은 서버로 전송되지 않습니다.</p>
+    </section>`;}
+    function introHtml(){const mode=sessionMode(),t=task();return `<section class="card intro">
+      <div class="eyebrow">Session ${s.sessionIndex+1}/3 · Task ${s.taskIndex+1}/3 · Set ${taskSet()}</div>
+      <h1>${safe(t.label)} <span class="muted">(${safe(t.id)})</span></h1>
+      <div class="row" style="margin-bottom:20px"><span class="pill">인터페이스 ${mode}</span><span class="pill">${nameForMode()}</span></div>
+      <div class="info"><h3>주문 과업</h3><p style="font-size:20px;font-weight:800;margin:0">${safe(t.instruction)}</p></div>
+      <p class="muted section-space">준비되면 '과업 시작'을 누르세요. 화면의 주문 지침을 참고하여 주문 확인까지 진행하세요. 실험 진행자는 조작 방법을 알려주지 않습니다.</p>
+      <div class="buttons"><button class="primary" data-action="begin-task">과업 시작</button></div>
+    </section>`;}
+    function orderHtml(){const mode=sessionMode(),t=task();return `<div class="shell device">
+      <aside class="sidebar"><div class="eyebrow">Session ${s.sessionIndex+1} / 3</div><div class="side-title section-space">과업 ${s.taskIndex+1} / 3</div><div class="side-task">${safe(t.label)}</div><div class="task-text">${safe(t.instruction)}</div>
+        <div class="info section-space"><strong>과업 진행 중</strong><div class="mini">측정 데이터는 참가자 화면에 표시되지 않습니다.</div></div>
+        <div class="section-space"><span class="pill">${mode} · ${nameForMode()}</span></div>
+        <p class="note section-space">화면을 새로고침하지 말고 주문 과업을 수행하세요.</p>
+        <button class="danger" data-action="abort" style="width:100%;margin-top:30px">과업 중도 포기</button>
+      </aside>
+      <div class="screen"><div class="topline"><div><div class="eyebrow">ORDER KIOSK · ${mode}</div><h2 style="margin:5px 0 0">주문하기</h2></div><span class="pill">${mode==='A'?'카테고리 탐색':mode==='B'?'단계별 주문':'전체 상품 탐색'}</span></div>
+        ${mode==='A'?hierarchicalHtml():mode==='B'?linearHtml():flatHtml()}
+      </div></div>`;}
+    function categoryCard(cat,label,subtitle,emoji){return `<button class="item" data-action="a-category" data-value="${cat}"><span class="emoji">${emoji}</span><strong>${label}</strong><span class="mini">${subtitle}</span></button>`;}
+    function hierarchicalHtml(){const u=s.ui;
+      const nav=`<div class="nav"><button class="${u.nav==='home'?'active':''}" data-action="a-home">전체 메뉴</button><button class="${u.nav==='products'&&u.category==='single'?'active':''}" data-action="a-category" data-value="single">버거 단품</button><button class="${u.nav==='products'&&u.category==='set'?'active':''}" data-action="a-category" data-value="set">버거 세트</button><button class="${u.nav==='products'&&u.category==='drink'?'active':''}" data-action="a-category" data-value="drink">음료</button><button class="${u.nav==='review'?'active':''}" data-action="a-review">장바구니 보기</button></div>`;
+      let body='';
+      if(u.nav==='home')body=`<h3>메뉴 카테고리를 선택하세요</h3><div class="item-grid">${categoryCard('single','버거 단품','햄버거 3종','🍔')}${categoryCard('set','버거 세트','세트 메뉴 3종','🍟')}${categoryCard('drink','음료','M 사이즈 2종','🥤')}</div><div class="info"><strong>장바구니:</strong> ${u.main?productName(u.main.burger)+' '+kindName(u.main.kind):'선택된 상품 없음'}${u.extraDrink!=='none'?' · '+drinkName(u.extraDrink):''}</div>`;
+      if(u.nav==='products'){
+        if(u.category==='drink')body=`<h3>음료 선택 (M 사이즈)</h3><div class="item-grid">${DRINKS.map(d=>`<button class="item" data-action="a-drink" data-value="${d.id}"><span class="emoji">${d.icon}</span><strong>${d.name}</strong><span class="price">${format(d.price)}</span></button>`).join('')}</div><div class="buttons"><button class="secondary" data-action="a-drink" data-value="none">추가 음료 제거</button></div><p class="note">음료를 선택하면 장바구니에 한 잔이 추가 또는 변경됩니다.</p>`;
+        else body=`<h3>${u.category==='set'?'버거 세트':'버거 단품'} 선택</h3><div class="item-grid">${PRODUCTS.map(p=>productCard(p,u.category,'a-product')).join('')}</div>`;
+      }
+      if(u.nav==='options')body=optionsHtml('A');
+      if(u.nav==='review')body=reviewHtml('A');
+      return nav+body;
+    }
+    // C: 카테고리 이동 없이 단품·세트·추가 음료를 하나의 전체 상품 목록에서 탐색한다.
+    function flatHtml(){const u=s.ui;
+      const nav=`<div class="nav"><button class="${u.nav==='home'?'active':''}" data-action="c-home">전체 상품 보기</button><button class="${u.nav==='review'?'active':''}" data-action="c-review">장바구니 보기</button></div>`;
+      let body='';
+      if(u.nav==='home'){
+        const cards=[...PRODUCTS.map(p=>productCard(p,'single','c-product')),...PRODUCTS.map(p=>productCard(p,'set','c-product')),...DRINKS.map(d=>`<button class="item" data-action="c-drink" data-value="${d.id}"><span class="emoji">${d.icon}</span><strong>${d.name}</strong><span class="mini">추가 음료</span><span class="price">${format(d.price)}</span></button>`)];
+        body=`<h3>전체 상품에서 원하는 메뉴를 선택하세요</h3><p class="note">카테고리 전환 없이 모든 상품을 같은 목록에 표시합니다. 단품과 세트는 각각 별도 상품입니다.</p><div class="item-grid flat-grid">${cards.join('')}</div><div class="info"><strong>장바구니:</strong> ${u.main?productName(u.main.burger)+' '+kindName(u.main.kind):'선택된 버거 없음'}${u.extraDrink!=='none'?' · '+drinkName(u.extraDrink):''}</div><div class="buttons"><button class="secondary" data-action="c-drink" data-value="none">추가 음료 제거</button><button class="primary" data-action="c-review">주문 확인</button></div>`;
+      }
+      if(u.nav==='options')body=optionsHtml('C');
+      if(u.nav==='review')body=reviewHtml('C');
+      return nav+body;
+    }
+    function productCard(p,kind,act){return `<button class="item" data-action="${act}" data-value="${p.id}|${kind}"><span class="emoji">${p.icon}</span><strong>${p.name} ${kind==='set'?'세트':''}</strong><span class="mini">${kind==='set'?'기본 감자튀김 M · 콜라':'단품'}</span><span class="price">${format(p.price+(kind==='set'?3200:0))}</span></button>`;}
+    function linearHtml(){const u=s.ui;const steps=['상품 선택','옵션 선택','추가 음료','주문 확인'];const curr=({product:0,options:1,beverage:2,review:3})[u.step];
+      const stepper=`<div class="steps">${steps.map((step,i)=>`<div class="step ${i===curr?'now':i<curr?'done':''}">${i+1}. ${step}</div>`).join('')}</div>`;
+      let body='';
+      if(u.step==='product')body=`<h3>1. 상품을 선택하세요</h3><div class="choice-list"><button class="choice ${u.selectedKind==='single'?'selected':''}" data-action="b-kind" data-value="single">버거 단품</button><button class="choice ${u.selectedKind==='set'?'selected':''}" data-action="b-kind" data-value="set">버거 세트</button></div><div class="item-grid">${PRODUCTS.map(p=>productCard(p,u.selectedKind,'b-product')).join('')}</div>`;
+      if(u.step==='options')body=optionsHtml('B');
+      if(u.step==='beverage')body=`<h3>3. 음료를 추가하시겠습니까?</h3><p class="note">단품에 추가하는 음료입니다. 세트에 포함된 음료와는 별도입니다.</p><div class="choice-list"><button class="choice ${u.extraDrink==='none'?'selected':''}" data-action="b-extra" data-value="none">추가 안 함</button>${DRINKS.map(d=>`<button class="choice ${u.extraDrink===d.id?'selected':''}" data-action="b-extra" data-value="${d.id}">${d.name}</button>`).join('')}</div><div class="buttons"><button class="ghost" data-action="b-back" data-value="options">이전</button><button class="primary" data-action="b-next-review">주문 확인으로</button></div>`;
+      if(u.step==='review')body=reviewHtml('B');
+      return stepper+body;
+    }
+    function optionsHtml(mode){const u=s.ui;const p=u.pending;if(!p)return '<p>선택된 상품이 없습니다.</p>';
+      return `<h3>${mode==='B'?'2. 상품 옵션 선택':'상품 옵션 선택'}</h3><p class="muted">${productName(p.burger)} ${kindName(p.kind)} · 기본 구성에서 변경할 옵션을 선택하세요.</p>
+        <div class="option-block"><h3>제외할 재료 (복수 선택 가능)</h3><div class="choice-list">${[['onion','양파 제외'],['pickle','피클 제외']].map(([id,label])=>`<button class="choice ${p.excluded.includes(id)?'selected':''}" data-action="exclude" data-value="${id}">${label} ${p.excluded.includes(id)?'✓':''}</button>`).join('')}</div></div>
+        ${p.kind==='set'?`<div class="option-block"><h3>감자튀김 크기</h3><div class="choice-list">${['M','L'].map(v=>`<button class="choice ${p.fries===v?'selected':''}" data-action="fries" data-value="${v}">${v}</button>`).join('')}</div></div>
+        <div class="option-block"><h3>세트 음료</h3><div class="choice-list">${DRINKS.map(d=>`<button class="choice ${p.drink===d.id?'selected':''}" data-action="set-drink" data-value="${d.id}">${d.name}</button>`).join('')}</div></div>`:''}
+        <div class="buttons"><button class="ghost" data-action="${mode==='A'?'a-back-to-products':mode==='C'?'c-home':'b-back'}" ${mode==='B'?'data-value="product"':''}>이전</button><button class="primary" data-action="${mode==='A'?'a-add-main':mode==='C'?'c-add-main':'b-next-beverage'}">${mode==='B'?'다음 단계':'장바구니에 담기'}</button></div>`;
+    }
+    function summaryMain(){const u=s.ui,m=u.main;const exclusions=m?.excluded?.length?m.excluded.map(x=>x==='onion'?'양파 제외':'피클 제외').join(', '):'제외 재료 없음';
+      if(!m)return `<div class="receipt-row"><span>버거 선택</span><strong>없음</strong></div>`;
+      return `<div class="receipt-row"><span>${productName(m.burger)} ${kindName(m.kind)}</span><strong>${format((PRODUCTS.find(x=>x.id===m.burger)?.price||0)+(m.kind==='set'?3200:0))}</strong></div><div class="receipt-row"><span>요청한 재료 제외</span><strong>${exclusions}</strong></div>${m.kind==='set'?`<div class="receipt-row"><span>세트 구성</span><strong>감자튀김 ${m.fries} · ${drinkName(m.drink)}</strong></div>`:''}`;
+    }
+    function reviewHtml(mode){const u=s.ui;const m=u.main;
+      return `<h3>${mode==='B'?'4. 주문 내역 확인':'장바구니 확인'}</h3><div class="receipt">${summaryMain()}<div class="receipt-row"><span>추가 음료</span><strong>${u.extraDrink==='none'?'없음':drinkName(u.extraDrink)}</strong></div><div class="receipt-row"><span>총 금액</span><strong>${format((m?(PRODUCTS.find(p=>p.id===m.burger)?.price||0)+(m.kind==='set'?3200:0):0)+(u.extraDrink!=='none'?2200:0))}</strong></div></div>
+      <p class="note">주문 내용이 과업 지시와 일치하는지 확인한 뒤 '주문 확정'을 누르세요. 주문 확정 후에는 수정할 수 없습니다.</p>
+      <div class="buttons">${mode==='A'?'<button class="ghost" data-action="a-home">메뉴로 돌아가기</button>':mode==='C'?'<button class="ghost" data-action="c-home">전체 메뉴로 돌아가기</button>':'<button class="ghost" data-action="b-back" data-value="beverage">이전 단계</button>'}<button class="primary" data-action="confirm-order">주문 확정</button></div>`;
+    }
+    function susHtml(){const mode=sessionMode();return `<section class="card intro"><div class="eyebrow">Session ${s.sessionIndex+1} / 3 · 사용성 설문</div><h1>인터페이스 ${mode} 사용성 설문 (SUS)</h1><p class="muted">방금 사용한 ${nameForMode()} 메뉴만 생각하며 답해 주세요. 모든 문항은 1~5점입니다.</p>
+      <div class="info">1 = 전혀 동의하지 않음 · 2 = 동의하지 않음 · 3 = 보통 · 4 = 동의함 · 5 = 매우 동의함</div>
+      <form id="susForm">${SUS.map((q,i)=>`<div class="survey-item"><p>${i+1}. ${safe(q)}</p><div class="radio-line">${[1,2,3,4,5].map(v=>`<label class="rating"><input type="radio" name="q${i+1}" value="${v}" ${s.answers['q'+(i+1)]===String(v)?'checked':''}><span>${v}점</span></label>`).join('')}</div></div>`).join('')}<div class="buttons"><button type="submit" class="primary">설문 제출 · 다음 단계</button></div></form>
+      <p class="note section-space">설문을 제출하면 이번 인터페이스의 SUS 점수가 계산됩니다. 참가자에게 점수를 보여주지 않도록 진행하세요.</p>
+    </section>`;}
+    function breakHtml(){return `<section class="card intro"><div class="eyebrow">인터페이스 ${s.sessionIndex} / 3 완료</div><h1>다음 메뉴 구조 평가 전 휴식</h1><p>다음 인터페이스로 이동하기 전 약 2분간 휴식하세요.</p><div class="info">현재까지 주문 과업 ${s.records.length}건과 사용성 설문 ${s.surveys.length}건이 기록되었습니다.</div><div class="buttons"><button class="primary" data-action="continue-session">휴식 후 다음 인터페이스 시작</button></div></section>`;}
+    function completeHtml(){return `<section class="card intro"><div class="eyebrow">Study complete</div><h1>실험 기록이 완료되었습니다</h1><p>참가자 <strong>${safe(s.id)}</strong> · 주문 과업 <strong>${s.records.length}건</strong> · SUS 설문 <strong>${s.surveys.length}건</strong></p>
+      <div class="info"><strong>중요:</strong> 아래 파일을 반드시 다운로드해서 연구자가 보관하세요. GitHub Pages에는 서버나 공동 데이터베이스가 없으며, 이 데이터는 다른 기기로 자동 전송되지 않습니다.</div>
+      <div class="buttons"><button class="primary" data-action="download-tasks">과업 결과 CSV</button><button class="primary" data-action="download-sus">SUS 설문 CSV</button><button class="secondary" data-action="download-events">상세 클릭 로그 CSV</button><button class="secondary" data-action="download-backup">전체 백업 JSON</button><button class="ghost" data-action="new-study">새 참가자 시작</button></div>
+      <table class="summary-table"><thead><tr><th>세션</th><th>과업</th><th>성공 여부</th><th>시간(s)</th><th>터치</th><th>오류</th></tr></thead><tbody>${s.records.map(r=>`<tr><td>${r.mode} (${r.task_set})</td><td>${r.task_id}</td><td>${r.success?'성공':'실패'}</td><td>${r.time_sec}</td><td>${r.touches}</td><td>${r.errors}</td></tr>`).join('')}</tbody></table>
+      <p class="note">표는 연구자 확인용이며, 다음 참가자에게는 새 참가자를 시작한 후 화면을 넘겨 주세요.</p>
+    </section>`;}
+    function beginTask(){s.ui=emptyUI();s.taskIndex=s.taskIndex||0;s.taskStarted=Date.now();s.taskCounter++;s.screen='ordering';render();}
+    function selectProduct(encoded,mode){const [burger,kind]=encoded.split('|');const targ=task().target;const isWrong=targ.burger!==burger||targ.kind!==kind;logEvent('select_product',encoded,isWrong);s.ui.pending={burger,kind,excluded:[],fries:kind==='set'?'M':null,drink:kind==='set'?'cola':null};if(mode==='A'||mode==='C')s.ui.nav='options';else s.ui.step='options';render();}
+    function logOmission(reason,value){const now=Date.now();s.ui.errors++;s.events.push({participant_id:s.id,session_index:s.sessionIndex+1,mode:sessionMode(),task_set:taskSet(),task_id:task().id,task_attempt:s.taskCounter,local_time:new Date(now).toISOString(),elapsed_sec:((now-s.taskStarted)/1000).toFixed(2),screen:'order_validation',action:reason,value,error_flag:1});}
+    function checkOmissions(){const wanted=task().target,actual=currentOrder();
+      if(actual.kind!==wanted.kind||actual.burger!==wanted.burger)return;
+      for(const ingredient of wanted.excluded)if(!actual.excluded.includes(ingredient))logOmission('missing_required_exclusion',ingredient);
+      if(wanted.extraDrink!=='none'&&actual.extraDrink==='none')logOmission('missing_required_extra_drink',wanted.extraDrink);
+      if(wanted.kind==='set'&&wanted.fries!=='M'&&actual.fries==='M')logOmission('missing_required_fries_change',wanted.fries);
+      if(wanted.kind==='set'&&wanted.drink!=='cola'&&actual.drink==='cola')logOmission('missing_required_set_drink_change',wanted.drink);
+    }
+    function doneTask(aborted){if(!aborted)checkOmissions();const time=(Date.now()-s.taskStarted)/1000;const actual=currentOrder();const ok=!aborted&&matches();s.records.push({participant_id:s.id,session_index:s.sessionIndex+1,mode:sessionMode(),task_set:taskSet(),interface_order:s.order,task_set_order:s.setOrder,task_id:task().id,task_label:task().label,task_attempt:s.taskCounter,success:ok?1:0,status:aborted?'aborted':ok?'success':'wrong_order',time_sec:time.toFixed(2),touches:s.ui.touches,errors:s.ui.errors,started_at:new Date(s.taskStarted).toISOString(),finished_at:new Date().toISOString(),expected_order:JSON.stringify(expected()),actual_order:JSON.stringify(actual)});
+      if(s.taskIndex<2){s.taskIndex++;s.screen='intro';}else{s.screen='sus';s.answers={};}s.ui=null;s.taskStarted=null;render();}
+    function toSus(){const vals=SUS.map((q,i)=>Number(s.answers['q'+(i+1)]));if(vals.some(x=>!Number.isInteger(x)||x<1||x>5)){alert('10개 문항에 모두 응답해 주세요.');return;}
+      const score=2.5*vals.reduce((acc,v,i)=>acc+(i%2===0?v-1:5-v),0);
+      s.surveys.push({participant_id:s.id,session_index:s.sessionIndex+1,mode:sessionMode(),task_set:taskSet(),interface_order:s.order,task_set_order:s.setOrder,sus_score:score,answered_at:new Date().toISOString(),...Object.fromEntries(vals.map((v,i)=>['q'+(i+1),v]))});
+      if(s.sessionIndex<2){s.sessionIndex++;s.taskIndex=0;s.answers={};s.screen='break';}else s.screen='complete';render();}
+    function quoteCsv(v){const str=(v==null?'':String(v));return /[",\n\r]/.test(str)?'"'+str.replace(/"/g,'""')+'"':str;}
+    function csv(rows,cols){return '\uFEFF'+cols.join(',')+'\r\n'+rows.map(r=>cols.map(k=>quoteCsv(r[k])).join(',')).join('\r\n');}
+    function download(text,name,mime='text/csv;charset=utf-8'){const b=new Blob([text],{type:mime});const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500);}
+    function downloadPart(part){if(!s.records.length&&!s.surveys.length){alert('아직 저장된 측정 결과가 없습니다.');return;}
+      const prefix='kiosk_'+(s.id||'participant').replace(/[^\w가-힣-]/g,'_')+'_'+new Date().toISOString().slice(0,10);
+      const rcols=['participant_id','session_index','mode','task_set','interface_order','task_set_order','task_id','task_label','task_attempt','success','status','time_sec','touches','errors','started_at','finished_at','expected_order','actual_order'];
+      const ecols=['participant_id','session_index','mode','task_set','task_id','task_attempt','local_time','elapsed_sec','screen','action','value','error_flag'];
+      const scols=['participant_id','session_index','mode','task_set','interface_order','task_set_order',...Array.from({length:10},(_,i)=>'q'+(i+1)),'sus_score','answered_at'];
+      if(part==='tasks')download(csv(s.records,rcols),prefix+'_tasks.csv');
+      else if(part==='events')download(csv(s.events,ecols),prefix+'_events.csv');
+      else if(part==='sus')download(csv(s.surveys,scols),prefix+'_sus.csv');
+      else if(part==='backup')download(JSON.stringify({exported_at:new Date().toISOString(),study:s},null,2),prefix+'_backup.json','application/json;charset=utf-8');
+    }
+    function confirmNew(){if(!confirm('현재 브라우저에 저장된 참가자 기록을 지우고 새 참가자를 시작합니다. 데이터 다운로드를 완료했나요?'))return;s=freshState();save();render();}
+    app.addEventListener('input',e=>{if(e.target.id==='pid'){s.id=e.target.value;save();}});
+    app.addEventListener('change',e=>{if(e.target.id==='order'){s.order=e.target.value;save();}else if(e.target.id==='setOrder'){s.setOrder=e.target.value;save();}else if(e.target.matches('input[type=radio]')&&s.screen==='sus'){s.answers[e.target.name]=e.target.value;save();}});
+    app.addEventListener('submit',e=>{if(e.target.id==='susForm'){e.preventDefault();toSus();}});
+    app.addEventListener('click',e=>{
+      const b=e.target.closest('[data-action]');if(!b||b.disabled)return;const a=b.dataset.action,v=b.dataset.value||'',u=s.ui;
+      if(a==='start-study'){s.id=(document.getElementById('pid')?.value||'').trim();s.order=document.getElementById('order')?.value||'ABC';s.setOrder=document.getElementById('setOrder')?.value||'XYZ';if(!/^[\w가-힣-]{2,30}$/.test(s.id)){alert('참가자 ID는 영문·숫자·한글·하이픈·밑줄로 2~30자 입력해 주세요.');return;}if(!document.getElementById('consent')?.checked){alert('참가자 참여 동의를 확인해 주세요.');return;}s.consentAt=new Date().toISOString();s.sessionIndex=0;s.taskIndex=0;s.screen='intro';s.startedAt=Date.now();render();return;}
+      if(a==='begin-task'){beginTask();return;}
+      if(a==='continue-session'&&s.screen==='break'){s.screen='intro';render();return;}
+      if(a==='download-tasks'||a==='download-sus'||a==='download-events'||a==='download-backup'){downloadPart(a.split('-')[1]);return;}
+      if(a==='new-study'){confirmNew();return;}
+      if(s.screen!=='ordering')return;
+      if(a==='abort'){if(confirm('이 과업을 중도 포기 처리할까요?')){logEvent('abort_task');doneTask(true);}return;}
+      if(a==='a-home'){logEvent('go_home');u.nav='home';render();return;}
+      if(a==='a-category'){logEvent('open_category',v);u.nav='products';u.category=v;render();return;}
+      if(a==='a-product'||a==='b-product'||a==='c-product'){selectProduct(v,a==='a-product'?'A':a==='b-product'?'B':'C');return;}
+      if(a==='c-home'){logEvent('go_all_products');u.nav='home';render();return;}
+      if(a==='c-review'){logEvent('open_cart');u.nav='review';render();return;}
+      if(a==='c-drink'){logEvent('add_extra_drink',v,v!==task().target.extraDrink);u.extraDrink=v;u.nav='home';render();return;}
+      if(a==='c-add-main'){logEvent('add_to_cart');u.main=structuredClone(u.pending);u.pending=null;u.nav='home';render();return;}
+      if(a==='b-kind'){logEvent('change_kind',v);u.selectedKind=v;render();return;}
+      if(a==='exclude'){const idx=u.pending.excluded.indexOf(v),newList=[...u.pending.excluded];if(idx<0)newList.push(v);else newList.splice(idx,1);
+        const targetExcluded=task().target.excluded;logEvent('toggle_exclusion',v+':'+(idx<0?'on':'off'),idx<0&&!targetExcluded.includes(v));u.pending.excluded=newList;render();return;}
+      if(a==='fries'){logEvent('select_fries',v,v!==task().target.fries);u.pending.fries=v;render();return;}
+      if(a==='set-drink'){logEvent('select_set_drink',v,v!==task().target.drink);u.pending.drink=v;render();return;}
+      if(a==='a-back-to-products'){logEvent('back_to_products');u.nav='products';render();return;}
+      if(a==='a-add-main'){logEvent('add_to_cart');u.main=structuredClone(u.pending);u.pending=null;u.nav='home';render();return;}
+      if(a==='a-drink'){logEvent('add_extra_drink',v,v!==task().target.extraDrink);u.extraDrink=v;u.nav='home';render();return;}
+      if(a==='a-review'){logEvent('open_cart');u.nav='review';render();return;}
+      if(a==='b-back'){logEvent('step_back',v);u.step=v;render();return;}
+      if(a==='b-next-beverage'){logEvent('next_to_drink');u.main=structuredClone(u.pending);u.step='beverage';render();return;}
+      if(a==='b-extra'){logEvent('select_extra_drink',v,v!==task().target.extraDrink);u.extraDrink=v;render();return;}
+      if(a==='b-next-review'){logEvent('next_to_review');u.step='review';render();return;}
+      if(a==='confirm-order'){
+        if(!u.main){logEvent('empty_order_attempt','',true);alert('버거를 먼저 선택해 주세요.');return;}
+        logEvent('confirm_order',JSON.stringify(currentOrder()));doneTask(false);return;
+      }
+    });
+    function tick(){if(s.screen==='ordering'&&s.taskStarted){const e=document.getElementById('elapsed');if(e)e.textContent=((Date.now()-s.taskStarted)/1000).toFixed(1)+' s';const t=document.getElementById('touches');if(t&&s.ui)t.textContent=s.ui.touches;}}
+    setInterval(tick,200);
+    render();
+  </script>
+</body>
+</html>
